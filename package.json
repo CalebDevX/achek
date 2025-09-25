@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "postcss.config.js",
   "scripts": {
-    "dev": "npm run dev --prefix server",
-    "dev:bot": "npm start --prefix AchekBot",
+    "dev": "tsx apps/bot-api/src/index.ts",
+    "dev:legacy-bot": "npm start --prefix AchekBot",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,8 +14,16 @@
   "dependencies": {
     "@google/genai": "^1.20.0",
     "@google/generative-ai": "^0.24.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.2",
+    "cors": "^2.8.5",
     "drizzle-orm": "^0.44.5",
     "drizzle-zod": "^0.8.3",
+    "express": "^5.1.0",
+    "mysql2": "^3.15.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
     "zod": "^4.1.11"
   }
 }

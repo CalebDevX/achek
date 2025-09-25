@@ -1,0 +1,14 @@
+{
+  "name": "achek-server",
+  "version": "1.0.0", 
+  "description": "Achek Digital Solutions Server",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ../apps/bot-api/src/index.ts",
+    "start": "node ../apps/bot-api/dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["achek", "server"],
+  "author": "Achek Digital Solutions",
+  "license": "MIT"
+}
