@@ -1,0 +1,29 @@
+
+import { drizzle } from 'drizzle-orm/mysql2';
+import mysql from 'mysql2/promise';
+import * as schema from "@shared/schema";
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+const dbHost = process.env.DB_HOST;
+const dbPort = process.env.DB_PORT;
+const dbName = process.env.DB_NAME;
+const dbUser = process.env.DB_USER;
+const dbPass = process.env.DB_PASS;
+
+if (!dbHost || !dbPort || !dbName || !dbUser || !dbPass) {
+  throw new Error("Database environment variables must be set");
+}
+
+export const connection = mysql.createPool({
+  host: dbHost,
+  port: parseInt(dbPort),
+  database: dbName,
+  user: dbUser,
+  password: dbPass,
+});
+
+export const db = drizzle(connection, { schema, mode: "default" });
+
