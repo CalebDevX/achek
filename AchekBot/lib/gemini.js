@@ -1,7 +1,7 @@
 // gemini.js - Gemini API integration for WhatsApp bot
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCpqEdPU-HF_HVh2HM9YeXiZEcFIIboBlc';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const COMPANY_CONTEXT = `You are an AI assistant for Achek Digital Solutions, a Nigerian tech company. Always answer as a helpful, professional Achek Digital Solutions representative. Use the following company details for all answers:

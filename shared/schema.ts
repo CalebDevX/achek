@@ -1,7 +1,106 @@
-import { sql } from "drizzle-orm";
-import { text, varchar, serial, timestamp, boolean, int, mysqlTable } from "drizzle-orm/mysql-core";
+import { sql, relations } from "drizzle-orm";
+import { text, varchar, serial, timestamp, boolean, int, mysqlTable, json, index, uniqueIndex } from "drizzle-orm/mysql-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Multi-tenant tables for commercial WhatsApp bot
+
+// Tenants table - each customer organization
+export const tenants = mysqlTable("tenants", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  domain: varchar("domain", { length: 255 }).unique(),
+  status: varchar("status", { length: 50 }).default("active"),
+  settings: json("settings"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+});
+
+// WhatsApp connections per tenant
+export const whatsappConnections = mysqlTable("whatsapp_connections", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenant_id", { length: 36 }).notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  phoneNumberId: varchar("phone_number_id", { length: 255 }).notNull(),
+  accessTokenEncrypted: text("access_token_encrypted").notNull(), // Encrypted access token
+  verifyTokenEncrypted: varchar("verify_token_encrypted", { length: 500 }).notNull(), // Encrypted verify token
+  webhookUrl: varchar("webhook_url", { length: 500 }),
+  status: varchar("status", { length: 50 }).default("active"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  tenantIdIdx: index("whatsapp_connections_tenant_id_idx").on(table.tenantId),
+  uniqueTenantPhone: uniqueIndex("whatsapp_connections_tenant_phone_unique").on(table.tenantId, table.phoneNumberId),
+}));
+
+// Conversations for each tenant
+export const conversations = mysqlTable("conversations", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenant_id", { length: 36 }).notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  whatsappNumber: varchar("whatsapp_number", { length: 50 }).notNull(),
+  customerName: varchar("customer_name", { length: 255 }),
+  status: varchar("status", { length: 50 }).default("active"),
+  lastMessageAt: timestamp("last_message_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  tenantIdIdx: index("conversations_tenant_id_idx").on(table.tenantId),
+  createdAtIdx: index("conversations_created_at_idx").on(table.createdAt),
+  tenantWhatsappUnique: uniqueIndex("conversations_tenant_whatsapp_unique").on(table.tenantId, table.whatsappNumber),
+}));
+
+// Messages for conversations
+export const whatsappMessages = mysqlTable("whatsapp_messages", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  conversationId: varchar("conversation_id", { length: 36 }).notNull().references(() => conversations.id, { onDelete: "cascade" }),
+  tenantId: varchar("tenant_id", { length: 36 }).notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  messageId: varchar("message_id", { length: 255 }),
+  type: varchar("type", { length: 50 }).notNull(), // text, image, document, etc
+  content: text("content"),
+  direction: varchar("direction", { length: 10 }).notNull(), // inbound, outbound
+  status: varchar("status", { length: 50 }).default("sent"),
+  metadata: json("metadata"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  tenantIdIdx: index("whatsapp_messages_tenant_id_idx").on(table.tenantId),
+  conversationIdIdx: index("whatsapp_messages_conversation_id_idx").on(table.conversationId),
+  createdAtIdx: index("whatsapp_messages_created_at_idx").on(table.createdAt),
+}));
+
+// Transactions tracking per tenant
+export const transactions = mysqlTable("transactions", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenant_id", { length: 36 }).notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  conversationId: varchar("conversation_id", { length: 36 }).references(() => conversations.id, { onDelete: "set null" }),
+  transactionId: varchar("transaction_id", { length: 255 }).notNull(),
+  amount: int("amount").notNull(), // in cents
+  currency: varchar("currency", { length: 10 }).default("NGN"),
+  status: varchar("status", { length: 50 }).notNull(),
+  paymentMethod: varchar("payment_method", { length: 100 }),
+  customerEmail: varchar("customer_email", { length: 255 }),
+  metadata: json("metadata"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+}, (table) => ({
+  tenantIdIdx: index("transactions_tenant_id_idx").on(table.tenantId),
+  transactionIdIdx: index("transactions_transaction_id_idx").on(table.transactionId),
+  createdAtIdx: index("transactions_created_at_idx").on(table.createdAt),
+  uniqueTenantTransaction: uniqueIndex("transactions_tenant_transaction_unique").on(table.tenantId, table.transactionId),
+}));
+
+// Knowledge base for AI responses per tenant
+export const knowledgeBase = mysqlTable("knowledge_base", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenant_id", { length: 36 }).notNull().references(() => tenants.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  category: varchar("category", { length: 100 }),
+  tags: json("tags"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+}, (table) => ({
+  tenantIdIdx: index("knowledge_base_tenant_id_idx").on(table.tenantId),
+  categoryIdx: index("knowledge_base_category_idx").on(table.category),
+  isActiveIdx: index("knowledge_base_is_active_idx").on(table.isActive),
+}));
 
 // Users table
 export const users = mysqlTable("users", {
@@ -83,17 +182,45 @@ export const insertContactSchema = insertMessageSchema.extend({
 }));
 
 // Types
-export type User = typeof selectUserSchema._type;
-export type InsertUser = typeof insertUserSchema._type;
-export type PortfolioProject = typeof selectPortfolioSchema._type;
-export type InsertPortfolio = typeof insertPortfolioSchema._type;
-export type Testimonial = typeof selectTestimonialSchema._type;
-export type InsertTestimonial = typeof insertTestimonialSchema._type;
-export type Message = typeof selectMessageSchema._type;
-export type InsertMessage = typeof insertMessageSchema._type;
-export type Newsletter = typeof selectNewsletterSchema._type;
-export type InsertNewsletter = typeof insertNewsletterSchema._type;
+export type User = z.infer<typeof selectUserSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type PortfolioProject = z.infer<typeof selectPortfolioSchema>;
+export type InsertPortfolio = z.infer<typeof insertPortfolioSchema>;
+export type Testimonial = z.infer<typeof selectTestimonialSchema>;
+export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
+export type Message = z.infer<typeof selectMessageSchema>;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Newsletter = z.infer<typeof selectNewsletterSchema>;
+export type InsertNewsletter = z.infer<typeof insertNewsletterSchema>;
 export type InsertContact = z.infer<typeof insertContactSchema>;
 
 // Portfolio type alias 
 export type Portfolio = PortfolioProject;
+
+// Multi-tenant bot schemas and types
+export const insertTenantSchema = createInsertSchema(tenants).omit({ id: true, createdAt: true, updatedAt: true });
+export const selectTenantSchema = createSelectSchema(tenants);
+export const insertWhatsappConnectionSchema = createInsertSchema(whatsappConnections).omit({ id: true, createdAt: true });
+export const selectWhatsappConnectionSchema = createSelectSchema(whatsappConnections);
+export const insertConversationSchema = createInsertSchema(conversations).omit({ id: true, createdAt: true });
+export const selectConversationSchema = createSelectSchema(conversations);
+export const insertWhatsappMessageSchema = createInsertSchema(whatsappMessages).omit({ id: true, createdAt: true });
+export const selectWhatsappMessageSchema = createSelectSchema(whatsappMessages);
+export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true, createdAt: true, updatedAt: true });
+export const selectTransactionSchema = createSelectSchema(transactions);
+export const insertKnowledgeBaseSchema = createInsertSchema(knowledgeBase).omit({ id: true, createdAt: true, updatedAt: true });
+export const selectKnowledgeBaseSchema = createSelectSchema(knowledgeBase);
+
+// Multi-tenant bot types
+export type Tenant = z.infer<typeof selectTenantSchema>;
+export type InsertTenant = z.infer<typeof insertTenantSchema>;
+export type WhatsappConnection = z.infer<typeof selectWhatsappConnectionSchema>;
+export type InsertWhatsappConnection = z.infer<typeof insertWhatsappConnectionSchema>;
+export type Conversation = z.infer<typeof selectConversationSchema>;
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type WhatsappMessage = z.infer<typeof selectWhatsappMessageSchema>;
+export type InsertWhatsappMessage = z.infer<typeof insertWhatsappMessageSchema>;
+export type Transaction = z.infer<typeof selectTransactionSchema>;
+export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type KnowledgeBase = z.infer<typeof selectKnowledgeBaseSchema>;
+export type InsertKnowledgeBase = z.infer<typeof insertKnowledgeBaseSchema>;
