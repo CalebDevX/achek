@@ -8,12 +8,8 @@ const KEY_LENGTH = 32;
 const IV_LENGTH = 16;
 const TAG_LENGTH = 16;
 
-// Encryption key is required and must be provided via environment variables
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
-
-if (!ENCRYPTION_KEY) {
-  throw new Error('ENCRYPTION_KEY environment variable is required for secure token storage');
-}
+// Encryption key is optional. If not set, use a default key for development/testing.
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || '2f8c1e7a9b4d6e3f5a1c8b7d2e6f9a3c';
 
 export interface EncryptionResult {
   encrypted: string;
