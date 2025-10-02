@@ -35,10 +35,29 @@ app.get("/sitemap.xml", async (req, res) => {
   try {
     const smStream = new SitemapStream({ hostname: "https://achek.com.ng" });
 
-    smStream.write({ url: "/", changefreq: "daily", priority: 1.0 });
-    smStream.write({ url: "/about", changefreq: "monthly", priority: 0.7 });
-    smStream.write({ url: "/contact", changefreq: "monthly", priority: 0.7 });
-    // Add more URLs here
+    // Main pages
+    smStream.write({ url: "/", changefreq: "weekly", priority: 1.0, lastmod: "2025-01-26" });
+    smStream.write({ url: "/about", changefreq: "monthly", priority: 0.9, lastmod: "2025-01-26" });
+    smStream.write({ url: "/services", changefreq: "monthly", priority: 0.9, lastmod: "2025-01-26" });
+    smStream.write({ url: "/portfolio", changefreq: "weekly", priority: 0.8, lastmod: "2025-01-26" });
+    smStream.write({ url: "/contact", changefreq: "monthly", priority: 0.8, lastmod: "2025-01-26" });
+    smStream.write({ url: "/pricing", changefreq: "monthly", priority: 0.7, lastmod: "2025-01-26" });
+    smStream.write({ url: "/blog", changefreq: "weekly", priority: 0.7, lastmod: "2025-01-26" });
+    smStream.write({ url: "/testimonials", changefreq: "monthly", priority: 0.6, lastmod: "2025-01-26" });
+    smStream.write({ url: "/faq", changefreq: "monthly", priority: 0.6, lastmod: "2025-01-26" });
+    smStream.write({ url: "/privacy", changefreq: "yearly", priority: 0.3, lastmod: "2025-01-26" });
+    smStream.write({ url: "/terms", changefreq: "yearly", priority: 0.3, lastmod: "2025-01-26" });
+
+    // Portfolio projects
+    const portfolioProjects = [
+      "AdUnit", "AgroConnect", "deliver", "EcommerceDashboard", "EduAfricaLMS",
+      "EventHub", "FintechDashboard", "FoodDelivery", "HealthLinkNG", "Marketplace",
+      "NewsPortal", "RealEstate", "receipt", "ShopSmartNG", "TravelNaija"
+    ];
+
+    portfolioProjects.forEach(project => {
+      smStream.write({ url: `/${project}`, changefreq: "monthly", priority: 0.5, lastmod: "2025-01-26" });
+    });
 
     smStream.end();
     const sitemap = await streamToPromise(smStream);
