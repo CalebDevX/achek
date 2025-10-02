@@ -1,3 +1,23 @@
+import sgMail from '@sendgrid/mail';
+
+if (!process.env.SENDGRID_API_KEY) {
+  console.warn('⚠️ SENDGRID_API_KEY is not set. Email functionality will be disabled.');
+} else {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  console.log('✅ SendGrid initialized successfully');
+  console.log('📧 Make sure to authenticate your domain in SendGrid for better deliverability');
+  console.log('🔐 Recommended: Add SPF record: v=spf1 include:sendgrid.net ~all');
+}
+
+// Sender for receipts to users
+const RECEIPT_FROM_EMAIL = process.env.EMAIL_SENDER || 'info@achek.com.ng';
+// Sender for contact form emails (to team) - extract just the email from the format
+const CONTACT_FROM_EMAIL = (process.env.MAIL_FROM_HELLO || 'hello@achek.com.ng').match(/<(.+)>/) 
+  ? (process.env.MAIL_FROM_HELLO || '').match(/<(.+)>/)![1] 
+  : process.env.MAIL_FROM_HELLO || 'hello@achek.com.ng';
+// Default team email for receiving messages
+const DEFAULT_TEAM_EMAIL = process.env.TEAM_EMAIL || 'team@achek.com.ng';
+
 interface ReceiptData {
   name: string;
   email: string;
@@ -8,15 +28,23 @@ interface ReceiptData {
 }
 
 export async function sendReceiptEmail(data: ReceiptData): Promise<boolean> {
+  if (!process.env.SENDGRID_API_KEY) {
+    console.error('❌ SendGrid API key not configured. Cannot send receipt email.');
+    return false;
+  }
+
   try {
+    console.log('📧 Attempting to send receipt email...');
+    console.log('   To:', data.email);
+    console.log('   From:', RECEIPT_FROM_EMAIL);
+
     const logoUrl = `${process.env.BASE_URL || "https://achek.com.ng"}/public/achek-logo.png`;
-    // Generate a unique transaction/invoice number
-    const transactionNumber = `ACH-${Date.now()}-${Math.floor(Math.random()*10000)}`;
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString();
-    const mailOptions = {
-      from: 'Achek Website <info@achek.com.ng>',
+    const transactionNumber = `ACH-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    const formattedDate = new Date().toLocaleDateString();
+
+    const msg = {
       to: data.email,
+      from: RECEIPT_FROM_EMAIL,
       subject: `Payment Receipt - Achek Digital Solutions [${transactionNumber}]`,
       html: `
         <div style="font-family:Segoe UI,Arial,sans-serif;background:#f9fafb;padding:32px;border-radius:12px;max-width:520px;margin:auto;box-shadow:0 2px 12px #0001;">
@@ -41,13 +69,35 @@ export async function sendReceiptEmail(data: ReceiptData): Promise<boolean> {
         </div>
       `,
     };
-    await transporter.sendMail(mailOptions);
+
+    const response = await sgMail.send(msg);
+    console.log('✅ Receipt email sent successfully!');
+    console.log('   Response status:', response[0]?.statusCode);
     return true;
-  } catch (error) {
-    console.error('Failed to send receipt email:', error);
+  } catch (error: any) {
+    console.error('❌ Failed to send receipt email:');
+    console.error('   To:', data.email);
+    console.error('   From:', RECEIPT_FROM_EMAIL);
+    console.error('   Error code:', error?.code);
+    console.error('   Error message:', error?.message);
+
+    // Check for specific error types
+    if (error?.response?.body?.errors) {
+      console.error('   SendGrid Errors:', JSON.stringify(error.response.body.errors, null, 2));
+    }
+
+    // Check for RBL/blocklist issues
+    if (error?.message?.includes('RBL') || error?.message?.includes('blocked')) {
+      console.error('   ⚠️ IP BLOCKLIST DETECTED: SendGrid IP is on a spam blocklist');
+      console.error('   Solution: Authenticate your domain in SendGrid Dashboard');
+      console.error('   Or use a different recipient email (Gmail, Outlook, etc.) for testing');
+    }
+
+    console.error('   Response body:', JSON.stringify(error?.response?.body, null, 2));
     return false;
   }
 }
+
 interface AdminNotificationData {
   name: string;
   email: string;
@@ -58,11 +108,21 @@ interface AdminNotificationData {
 }
 
 export async function sendAdminNotification(data: AdminNotificationData): Promise<boolean> {
+  if (!process.env.SENDGRID_API_KEY) {
+    console.error('❌ SendGrid API key not configured. Cannot send admin notification.');
+    return false;
+  }
+
   try {
+    console.log('📧 Attempting to send admin notification...');
+    console.log('   To:', DEFAULT_TEAM_EMAIL);
+    console.log('   From:', CONTACT_FROM_EMAIL);
+
     const logoUrl = `${process.env.BASE_URL || "https://achek.com.ng"}/public/achek-logo.png`;
-    const mailOptions = {
-      from: process.env.EMAIL_SENDER,
-      to: process.env.ADMIN_EMAIL, // Admin/team email
+
+    const msg = {
+      to: DEFAULT_TEAM_EMAIL,
+      from: CONTACT_FROM_EMAIL,
       subject: `New Order - ${data.service} (${data.package})`,
       html: `
         <div style="font-family:Segoe UI,Arial,sans-serif;background:#fff;padding:32px;border-radius:12px;max-width:480px;margin:auto;">
@@ -80,42 +140,33 @@ export async function sendAdminNotification(data: AdminNotificationData): Promis
         </div>
       `,
     };
-    await transporter.sendMail(mailOptions);
+
+    const response = await sgMail.send(msg);
+    console.log('✅ Admin notification sent successfully!');
+    console.log('   Response status:', response[0]?.statusCode);
     return true;
-  } catch (error) {
-    console.error('Failed to send admin notification:', error);
+  } catch (error: any) {
+    console.error('❌ Failed to send admin notification:');
+    console.error('   To:', DEFAULT_TEAM_EMAIL);
+    console.error('   From:', CONTACT_FROM_EMAIL);
+    console.error('   Error code:', error?.code);
+    console.error('   Error message:', error?.message);
+
+    // Check for specific error types
+    if (error?.response?.body?.errors) {
+      console.error('   SendGrid Errors:', JSON.stringify(error.response.body.errors, null, 2));
+    }
+
+    // Check for RBL/blocklist issues
+    if (error?.message?.includes('RBL') || error?.message?.includes('blocked')) {
+      console.error('   ⚠️ IP BLOCKLIST DETECTED: SendGrid IP is on a spam blocklist');
+      console.error('   Solution: Authenticate your domain in SendGrid Dashboard');
+    }
+
+    console.error('   Response body:', JSON.stringify(error?.response?.body, null, 2));
     return false;
   }
 }
-
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-// Create transporter using your SMTP settings
-const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST || 'smtp.gmail.com',
-  port: Number(process.env.MAIL_PORT) || 587,
-  secure: Number(process.env.MAIL_PORT) === 465, // true for 465, false for other ports
-  auth: {
-    user: process.env.MAIL_USER_HELLO,
-    pass: process.env.MAIL_PASS_HELLO,
-  },
-});
-
-  // Use environment variables for sender email and password
-  export const EMAIL_SENDER = process.env.EMAIL_SENDER;
-  export const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
-
-  // Example usage in email sending function:
-  // transporter.sendMail({
-  //   from: EMAIL_SENDER,
-  //   to: recipient,
-  //   subject: 'Your Receipt',
-  //   text: 'Thank you for your payment!',
-  //   auth: { user: EMAIL_SENDER, pass: EMAIL_PASSWORD }
-  // });
 
 interface ContactMessage {
   name: string;
@@ -127,10 +178,17 @@ interface ContactMessage {
 }
 
 export async function sendContactEmail(data: ContactMessage): Promise<boolean> {
+  if (!process.env.SENDGRID_API_KEY) {
+    console.error('❌ SendGrid API key not configured. Cannot send contact email.');
+    return false;
+  }
+
   try {
-    const mailOptions = {
-      from: process.env.MAIL_FROM_HELLO,
-      to: 'hello@achek.com.ng',
+    console.log('📧 Attempting to send contact email to:', DEFAULT_TEAM_EMAIL);
+
+    const msg = {
+      to: DEFAULT_TEAM_EMAIL,
+      from: CONTACT_FROM_EMAIL,
       subject: `New Contact Form Message from ${data.name}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -144,10 +202,27 @@ export async function sendContactEmail(data: ContactMessage): Promise<boolean> {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    await sgMail.send(msg);
+    console.log('✅ Contact email sent successfully to:', DEFAULT_TEAM_EMAIL);
     return true;
   } catch (error: any) {
-    console.error('Failed to send contact email:', error?.message || error);
+    console.error('❌ Failed to send contact email:');
+    console.error('   To:', DEFAULT_TEAM_EMAIL);
+    console.error('   From:', CONTACT_FROM_EMAIL);
+    console.error('   Error message:', error?.message);
+
+    // Check for specific error types
+    if (error?.response?.body?.errors) {
+      console.error('   SendGrid Errors:', JSON.stringify(error.response.body.errors, null, 2));
+    }
+
+    // Check for RBL/blocklist issues
+    if (error?.message?.includes('RBL') || error?.message?.includes('blocked')) {
+      console.error('   ⚠️ IP BLOCKLIST DETECTED: SendGrid IP is on a spam blocklist');
+      console.error('   Solution: Authenticate your domain in SendGrid Dashboard');
+    }
+
+    console.error('   Full error:', error?.response?.body || error);
     return false;
   }
 }
