@@ -4,8 +4,208 @@ import { useParams } from "wouter";
 import { blogPosts } from "@/pages/data/blogPosts";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/seo";
+import { Link } from "wouter";
 
-// ✅ Reusable AdSense component
+export default function BlogSingle() {
+  const { slug } = useParams();
+  const post = blogPosts.find((p) => p.slug === slug);
+
+  if (!post) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">Blog Post Not Found</h1>
+          <Link href="/blog">
+            <a className="text-blue-600 hover:underline">← Back to Blog</a>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const baseUrl = "https://achek.com.ng";
+  const postUrl = `${baseUrl}/blog/${post.slug}`;
+  const postImage = post.imageUrl || `${baseUrl}/achek-logo.png`;
+
+  // SEO configuration for individual blog post
+  const seo = {
+    title: `${post.title} | Achek Digital Solutions Blog`,
+    description: post.excerpt,
+    canonical: postUrl,
+    keywords: `${post.category}, ${post.title}, Achek blog, Nigeria tech blog, ${post.author}`,
+    ogImage: postImage,
+    ogType: "article",
+    author: post.author,
+  };
+
+  // Structured data for BlogPosting
+  const blogPostingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    image: postImage,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: {
+      "@type": "Person",
+      name: post.author,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Achek Digital Solutions",
+      logo: {
+        "@type": "ImageObject",
+        url: `${baseUrl}/achek-logo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": postUrl,
+    },
+  };
+
+  // Breadcrumb structured data
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: baseUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${baseUrl}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: postUrl,
+      },
+    ],
+  };
+
+  return (
+    <div className="min-h-screen bg-background pt-20 pb-16">
+      <SEO {...seo} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb Navigation */}
+        <nav className="mb-8 text-sm text-muted-foreground">
+          <Link href="/">
+            <a className="hover:text-primary">Home</a>
+          </Link>
+          {" / "}
+          <Link href="/blog">
+            <a className="hover:text-primary">Blog</a>
+          </Link>
+          {" / "}
+          <span className="text-foreground">{post.title}</span>
+        </nav>
+
+        {/* Category Badge */}
+        <Badge className="mb-4">{post.category}</Badge>
+
+        {/* Post Title */}
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+          {post.title}
+        </h1>
+
+        {/* Post Meta */}
+        <div className="flex items-center gap-4 mb-8 text-muted-foreground">
+          <span>By {post.author}</span>
+          <span>•</span>
+          <time dateTime={post.date}>
+            {new Date(post.date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </time>
+        </div>
+
+        {/* Featured Image */}
+        <img
+          src={postImage}
+          alt={post.title}
+          className="w-full h-64 md:h-96 object-cover rounded-2xl mb-8"
+          loading="eager"
+        />
+
+        {/* Post Content */}
+        <div className="prose prose-lg max-w-none mb-12">
+          {post.content.map((paragraph, index) => (
+            <p key={index} className="mb-6 text-lg leading-relaxed">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+
+        {/* Share Section */}
+        <div className="border-t border-b py-6 my-8">
+          <p className="text-sm font-semibold mb-3">Share this post:</p>
+          <div className="flex gap-4">
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(postUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              Twitter
+            </a>
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Facebook
+            </a>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-700 hover:underline"
+            >
+              LinkedIn
+            </a>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(post.title + " " + postUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:underline"
+            >
+              WhatsApp
+            </a>
+          </div>
+        </div>
+
+        {/* Back to Blog */}
+        <div className="mt-12">
+          <Link href="/blog">
+            <a className="inline-flex items-center text-primary hover:underline">
+              ← Back to all posts
+            </a>
+          </Link>
+        </div>
+      </article>
+    </div>
+  );
+}nt
 const AdSenseAd = ({
   slot,
   format = "auto",
