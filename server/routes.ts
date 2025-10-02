@@ -2,9 +2,11 @@ import { sendReceiptEmail } from "./email";
 const testReceiptRoute = express.Router();
 testReceiptRoute.post("/api/test-send-receipt", async (req, res) => {
   try {
+    // Use Gmail or another provider for testing if achek.com.ng blocks SendGrid IPs
+    const testEmail = req.body.email || 'caleonuche503@gmail.com';
     const testData = {
       name: "Test User",
-      email: req.body.email || "info@achek.com.ng",
+      email: testEmail,
       service: "Test Service",
       package: "Test Package",
       amount: 1000,
@@ -303,24 +305,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!subject || !content || !recipients || recipients.length === 0) {
         return res.status(400).json({ message: "Subject, content, and recipients are required" });
       }
-      const nodemailer = require('nodemailer');
-      let transporter;
-      try {
-        transporter = nodemailer.createTransport({
-          host: process.env.MAIL_HOST,
-          port: parseInt(process.env.MAIL_PORT || '465'),
-          secure: true,
-          auth: {
-            user: process.env.MAIL_USER_NEWS,
-            pass: process.env.MAIL_PASS_NEWS,
-          },
-        });
-        // Verify connection
-        await transporter.verify();
-      } catch (mailErr) {
-        console.error('Mail server connection failed:', mailErr);
-        return res.status(500).json({ message: 'Mail server connection failed. Please check your mail settings.', error: mailErr });
+      const sgMail = require('@sendgrid/mail');
+
+      if (!process.env.SENDGRID_API_KEY) {
+        return res.status(500).json({ message: "SendGrid API key not configured" });
       }
+
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      const fromEmail = process.env.NEWSLETTER_FROM || 'newsletter@achek.com.ng';
       const baseUrl = process.env.BASE_URL || "https://achek.com.ng";
       // Helper: rewrite links for click tracking
       const rewriteLinks = (html, email) =>
@@ -347,8 +339,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           html = rewriteLinks(html, email);
           html = addTrackingPixel(html, email);
           try {
-            await transporter.sendMail({
-              from: process.env.MAIL_FROM_NEWS,
+            await sgMail.send({
+              from: fromEmail,
               to: email,
               subject: subject,
               html,
@@ -358,7 +350,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           } catch (sendErr) {
             console.error(`Failed to send to ${email}:`, sendErr);
-            // Optionally, collect failed emails for admin feedback
             throw new Error(`Failed to send to ${email}: ${sendErr.message}`);
           }
         });
