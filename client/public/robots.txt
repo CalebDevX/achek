@@ -21,6 +21,7 @@ Allow: /portfolio
 Allow: /contact
 Allow: /pricing
 Allow: /blog
+Allow: /blog/*
 Allow: /testimonials
 Allow: /faq
 Allow: /privacy
