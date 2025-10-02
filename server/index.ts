@@ -55,8 +55,26 @@ app.get("/sitemap.xml", async (req, res) => {
       "NewsPortal", "RealEstate", "receipt", "ShopSmartNG", "TravelNaija"
     ];
 
+    // Blog posts
+    const blogPosts = [
+      "why-learn-python-2025", "caleonuche-impact", "react-vs-vue-vs-angular",
+      "benefits-of-nodejs", "why-learn-go", "ai-in-nigeria", "choosing-database",
+      "why-learn-typescript", "future-of-remote-work", "learning-rust",
+      "why-learn-django", "mobile-app-development-trends-2025",
+      "digital-marketing-strategies-nigeria", "cybersecurity-best-practices-2025",
+      "e-commerce-growth-africa", "cloud-computing-small-business",
+      "ui-ux-design-principles-2025", "startup-funding-nigeria-2025",
+      "blockchain-technology-africa", "social-media-marketing-tips-2025",
+      "web-development-frameworks-comparison", "caleb-onuche-biography"
+    ];
+
     portfolioProjects.forEach(project => {
       smStream.write({ url: `/${project}`, changefreq: "monthly", priority: 0.5, lastmod: "2025-01-26" });
+    });
+
+    // Add blog posts to sitemap
+    blogPosts.forEach(slug => {
+      smStream.write({ url: `/blog/${slug}`, changefreq: "monthly", priority: 0.6, lastmod: "2025-01-26" });
     });
 
     smStream.end();
