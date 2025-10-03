@@ -399,4 +399,129 @@ export const blogPosts: BlogPost[] = [
     "Through Achek Digital Solutions, Caleb is building opportunities for individuals and businesses to thrive in the digital age. His vision and story continue to inspire young people across Nigeria and beyond."
  ],
   },
+  {
+    slug: "meaning-of-achek",
+    title: "The Meaning of Achek",
+    excerpt:
+      "Achek comes from the Igala word Achekinyo, meaning 'we do it to be good.' It reflects our belief in excellence, purpose, and integrity.",
+    date: "2025-10-02",
+    author: "Achek Editorial Team",
+    category: "About",
+    imageUrl: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=800&q=80",
+    content: [
+      "Achek is more than just a name—it is a philosophy born from culture.",
+      "The word Achek is derived from Achekinyo, an Igala expression meaning 'we do it to be good.'",
+      "The Igala people, one of Nigeria’s great ethnic groups, value integrity, excellence, and purposeful action. Achek reflects these same values in the digital age.",
+      "At Achek Digital Solutions, we carry this meaning into technology: every website, app, and service is built with the intent to be good—functional, purposeful, and lasting.",
+      "Achek therefore bridges tradition and innovation: rooted in Igala heritage, expressed in modern digital solutions."
+    ],
+  },
+
+  {
+    slug: "definition-of-achek",
+    title: "Definition of Achek",
+    excerpt:
+      "Achek (noun): From the Igala word Achekinyo, meaning 'we do it to be good.' A principle of excellence, purpose, and integrity.",
+    date: "2025-10-03",
+    author: "Achek Editorial Team",
+    category: "About",
+    imageUrl: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80",
+    content: [
+      "Achek (noun): Derived from Achekinyo, an Igala word that translates to 'we do it to be good.'",
+      "Definition: A standard of excellence, purpose, and integrity applied to both life and work.",
+      "Usage: As a brand name, Achek represents digital innovation rooted in cultural values—websites, apps, and services created with the intent to be good.",
+      "Broader meaning: Achek can be understood as the pursuit of doing things well, with good intent and lasting impact.",
+      "In essence, Achek is more than a brand—it is a word of heritage that inspires modern solutions."
+    ],
+  },
+
+  {
+    slug: "meet-the-founder",
+    title: "Meet the Founder: Caleb Ojodale Onuche",
+    excerpt:
+      "At just 17, Caleb Ojodale Onuche founded Achek Digital Solutions. Discover his journey, vision, and the philosophy that drives him.",
+    date: "2025-10-04",
+    author: "Achek Editorial Team",
+    category: "People",
+    imageUrl: "https://i.ibb.co/N6c9yZ7W/caleb1.jpg?auto=format&fit=crop&w=800&q=80",
+    content: [
+      "Caleb Ojodale Onuche is a young Nigerian innovator and the founder of Achek Digital Solutions.",
+      "Born on July 25, 2008, and proudly Igala, Caleb grew up passionate about technology and creativity.",
+      "In 2025, at the age of 17, he established Achek, inspired by the Igala word Achekinyo, meaning 'we do it to be good.'",
+      "For Caleb, Achek is more than a company—it is a standard of excellence rooted in culture but expressed through digital innovation.",
+      "His vision is to make Achek a symbol of African creativity and a brand that carries culture into the global digital space."
+    ],
+  },
+
+  {
+    slug: "achek-story",
+    title: "From Igala Roots to Global Tech: The Achek Story",
+    excerpt:
+      "Achek began as a cultural word, Achekinyo, and transformed into a digital brand. This is the story of how tradition meets innovation.",
+    date: "2025-10-05",
+    author: "Achek Editorial Team",
+    category: "About",
+    imageUrl: "https://i.ibb.co/V0sqD8tj/logo.png?auto=format&fit=crop&w=800&q=80",
+    content: [
+      "Achek is rooted in the Igala language, where Achekinyo means 'we do it to be good.'",
+      "By shortening it to Achek, we created a name that is simple, modern, yet deeply meaningful.",
+      "Achek represents the fusion of African heritage with modern technology.",
+      "Our goal is to take this cultural foundation and build globally competitive digital solutions.",
+      "Achek is proof that tradition and innovation can coexist to create something unique and powerful."
+    ],
+  },
+
+  {
+    slug: "why-digital-identity-matters",
+    title: "Why Every Business Needs a Digital Identity",
+    excerpt:
+      "In today’s world, a business without an online presence is invisible. Discover why a digital identity is essential and how Achek helps build it.",
+    date: "2025-10-06",
+    author: "Caleb Onuche",
+    category: "Digital",
+    imageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
+    content: [
+      "In today’s business world, visibility is everything. If you’re not online, you’re invisible.",
+      "A website is the new storefront, and social media is the new marketplace.",
+      "At Achek, we help businesses create professional digital identities that build trust and attract customers.",
+      "From modern websites to payment integration and branding, we ensure your business is ready for the digital economy.",
+      "Because in the digital age, your identity is your success."
+    ],
+  },
+
+  {
+    slug: "excellence-in-action",
+    title: "Excellence in Action: Living the Achek Philosophy",
+    excerpt:
+      "Achek means 'we do it to be good.' But how does that look in practice? Here’s how our philosophy shapes every project.",
+    date: "2025-10-07",
+    author: "Achek Editorial Team",
+    category: "Philosophy",
+    imageUrl: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80",
+    content: [
+      "Excellence is not just a word at Achek—it is our identity.",
+      "We approach every project with the Achek mindset: it must be done with integrity, quality, and purpose.",
+      "This philosophy ensures that every website we design, every app we build, and every service we provide reflects 'we do it to be good.'",
+      "Excellence in action means delivering results that last and make an impact.",
+      "This is how we turn Achek into a lived philosophy, not just a name."
+    ],
+  },
+
+  {
+    slug: "future-of-african-tech",
+    title: "The Future of Achek & African Tech",
+    excerpt:
+      "African startups are shaping the global digital landscape. Discover Achek’s role in the future of innovation.",
+    date: "2025-10-08",
+    author: "Achek Editorial Team",
+    category: "Vision",
+    imageUrl: "https://i.ibb.co/V0sqD8tj/logo.png?auto=format&fit=crop&w=800&q=80",
+    content: [
+      "Africa is rising as a hub for digital innovation.",
+      "From fintech to e-commerce, African startups are solving global problems with local creativity.",
+      "Achek is part of this wave, bringing cultural roots into digital solutions that can compete globally.",
+      "Our vision is to build Achek into a leading African brand that represents excellence and innovation.",
+      "The future of African tech is bright—and Achek will be one of its shining names."
+    ],
+  },
 ];
