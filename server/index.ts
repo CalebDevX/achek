@@ -65,7 +65,9 @@ app.get("/sitemap.xml", async (req, res) => {
       "e-commerce-growth-africa", "cloud-computing-small-business",
       "ui-ux-design-principles-2025", "startup-funding-nigeria-2025",
       "blockchain-technology-africa", "social-media-marketing-tips-2025",
-      "web-development-frameworks-comparison", "caleb-onuche-biography"
+      "web-development-frameworks-comparison", "caleb-onuche-biography",
+      "meaning-of-achek", "definition-of-achek", "meet-the-founder",
+      "achek-story", "why-digital-identity-matters", "excellence-in-action","future-of-african-tech"
     ];
 
     portfolioProjects.forEach(project => {
