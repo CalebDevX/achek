@@ -1,4 +1,4 @@
-# Exported from Render on 2025-09-23T20:34:20Z
+# Exported from Render on 2025-10-03T08:50:15Z
 version: "1"
 services:
 - type: web
@@ -7,6 +7,15 @@ services:
   repo: https://github.com/CalebDevX/achek
   plan: free
   envVars:
+  - key: ENCRYPTION_KEY
+    sync: false
+  - key: WEB_NAME
+    fromService:
+      name: achek
+      type: web
+      property: host
+  - key: BASE_OWNER
+    sync: false
   - key: BASE_URL
     sync: false
   - key: MAIL_FROM_NEWS
@@ -71,10 +80,16 @@ services:
     sync: false
   - key: SPF_RECORD
     sync: false
+  - key: TEAM_EMAIL_PASS
+    sync: false
+  - key: TEAM_EMAIL
+    sync: false
+  - key: SENDGRID_API_KEY
+    sync: false
   region: oregon
   buildCommand: npm install; npm run build
   startCommand: npm run start
   domains:
-  - achek.com.ng
   - www.achek.com.ng
+  - achek.com.ng
   autoDeployTrigger: commit
