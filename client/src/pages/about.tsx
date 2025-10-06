@@ -22,7 +22,7 @@ function AboutPage() {
       "Learn about Achek Digital Solutions, a top web, mobile, and AI agency based in Nigeria. Discover our founder, team, mission, values, and journey transforming businesses across Africa and beyond.",
     canonical: "https://achek.com.ng/about",
     keywords:
-      "Achek Digital Solutions, About Achek, Caleb Onuche, caleboksy, Web Agency Nigeria, Mobile App Agency, AI Solutions Africa, Digital Transformation, Achek Team, Achek Founder, Achek Mission, Achek Vision, Achek Values, Achek History, Achek Lagos, Achek Abuja, Achek Portfolio",
+      "Achek Digital Solutions, About Achek, Achek, Caleb Onuche, caleboksy, Web Agency Nigeria, Mobile App Agency, AI Solutions Africa, Digital Transformation, Achek Team, Achek Founder, Achek Mission, Achek Vision, Achek Values, Achek History, Achek Lagos, Achek Abuja, Achek Portfolio",
     ogImage: "https://achek.com.ng/achek-logo.png",
     ogType: "website",
     ogTitle: "About Achek Digital Solutions | Leading Web, Mobile & AI Agency in Nigeria",
