@@ -374,6 +374,14 @@ function AboutPage() {
                       <Phone className="h-5 w-5 mr-3 text-primary" />
                       <span>Available for consultation</span>
                     </div>
+                    
+                 {/* LinkedIn profile badge - placed next to contact info */}
+                    <div className="mt-6 flex items-center justify-center md:justify-start">
+                      <div
+                        // LinkedIn provides HTML snippet; render safely as HTML
+                        dangerouslySetInnerHTML={{ __html: `<div class="badge-base LI-profile-badge" data-locale="en_US" data-size="medium" data-theme="dark" data-type="VERTICAL" data-vanity="caleb-onuche-20b163303" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://ng.linkedin.com/in/caleb-onuche-20b163303?trk=profile-badge">Caleb Onuche</a></div>` }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
